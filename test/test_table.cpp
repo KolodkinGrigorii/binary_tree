@@ -35,5 +35,20 @@ TEST(BinaryTreeTest, InsertAndRemove) {
 	std::string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(output, "20 40 50 70 ");
-};
+}
+TEST(BinaryTreeTest, Iterator) {
+	BinaryTree tree;
+	tree.insert(0);
+	tree.insert(1);
+	tree.insert(2);
+	tree.insert(3);
+	int i = 0;
+	for (auto it = tree.find(0); it != tree.find(3); ++it) {
+		EXPECT_EQ(i, it->value);
+		i++;
+	}
+	auto it = tree.find(1);
+	Node node=*it;
+	EXPECT_EQ(1, node.value);
+}
 
