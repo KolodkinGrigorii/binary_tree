@@ -1,75 +1,77 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
+template<typename TypeKey, typename TypeData>
 struct Node {
-    int value;
+    TypeKey key;
+    TypeData value;
     Node* left;
     Node* right;
 
-    Node(int val) {
+    Node(TypeKey nkey, TypeData val) {
+        key = nkey;
         value = val;
         left = NULL;
         right = NULL;
     }
 };
-
+template<typename TypeKey, typename TypeData>
 class BinaryTree {
 private:
-    Node* root;
+    Node<TypeKey, TypeData>* root;
     int size;
 
-    Node* insertHelper(Node* node, int value) {
+    Node<TypeKey, TypeData>* insertHelper(Node<TypeKey, TypeData>* node, TypeKey key, TypeData value) {
         if (node == NULL) {
-            return new Node(value);
+            return new Node<TypeKey, TypeData>(key, value);
         }
         if (value <= node->value) {
-            node->left = insertHelper(node->left, value);
+            node->left = insertHelper(node->left, key, value);
         }
         else {
-            node->right = insertHelper(node->right, value);
+            node->right = insertHelper(node->right, key, value);
         }
         size++;
         return node;
     }
 
-    Node* minValueNode(Node* node) {
-        Node* current = node;
+    Node<TypeKey, TypeData>* minValueNode(Node<TypeKey, TypeData>* node) {
+        Node<TypeKey, TypeData>* current = node;
         while (current && current->left != NULL) {
             current = current->left;
         }
         return current;
     }
 
-    Node* deleteHelper(Node* node, int value) {
+    Node<TypeKey, TypeData>* deleteHelper(Node<TypeKey, TypeData>* node, TypeKey key, TypeData value) {
         if (node == NULL) {
             return node;
         }
         if (value < node->value) {
-            node->left = deleteHelper(node->left, value);
+            node->left = deleteHelper(node->left, key, value);
         }
         else if (value > node->value) {
-            node->right = deleteHelper(node->right, value);
+            node->right = deleteHelper(node->right, key, value);
         }
         else {
             if (node->left == NULL) {
-                Node* temp = node->right;
+                Node<TypeKey, TypeData>* temp = node->right;
                 delete node;
                 return temp;
             }
             else if (node->right == NULL) {
-                Node* temp = node->left;
+                Node<TypeKey, TypeData>* temp = node->left;
                 delete node;
                 return temp;
             }
-            Node* temp = minValueNode(node->right);
-            node->value = temp->value;
-            node->right = deleteHelper(node->right, temp->value);
+            Node<TypeKey, TypeData>* temp = minValueNode(node->right);
+            node->value = temp->key;
+            node->right = deleteHelper(node->right, temp->key, temp->value);
         }
         return node;
     }
 
-    void inorderHelper(Node* node) {
+    void inorderHelper(Node<TypeKey, TypeData>* node) {
         if (node != NULL) {
             inorderHelper(node->left);
             cout << node->value << " ";
@@ -80,11 +82,11 @@ private:
 public:
     class Iterator {
     private:
-        Node* node;
-        vector<Node> order;
+        Node<TypeKey, TypeData>* node;
+        vector<Node<TypeKey, TypeData>> order;
         vector<bool> was;
     public:
-        void DFS(Node& node) {
+        void DFS(Node<TypeKey, TypeData>& node) {
             if (node.left != NULL && !was[node.left->value]) {
                 DFS(*node.left);
             }
@@ -94,7 +96,7 @@ public:
             was[node.value] = true;
             order.push_back(node);
         }
-        void sort(vector<Node>& order) {
+        void sort(vector<Node<TypeKey, TypeData>>& order) {
             for (int i = 0; i < order.size(); i++) {
                 for (int j = 0; j < order.size(); j++) {
                     if (order[i].value < order[j].value) {
@@ -103,10 +105,10 @@ public:
                 }
             }
         }
-        Iterator(Node* nod, Node* root, int size) { node = nod; was = vector<bool>(size); DFS(*root); sort(order);  }
+        Iterator(Node<TypeKey, TypeData>* nod, Node<TypeKey, TypeData>* root, int size) { node = nod; was = vector<bool>(size); DFS(*root); sort(order); }
         Iterator& operator++() {
             for (int i = 0; i < order.size(); i++) {
-                if (order[i].value == node->value) {
+                if (order[i].key == node->key) {
                     this->node = &order[i + 1];
                     return *this;
                 }
@@ -118,12 +120,12 @@ public:
         }
         bool operator !=(const Iterator& other)
         {
-            return !(node->value==other.node->value);
+            return !(node->key == other.node->key);
         }
-        Node& operator*() {
-            return *node;
+        TypeData& operator*() {
+            return node->value;
         }
-        Node* operator->() {
+        Node<TypeKey, TypeData>* operator->() {
             return this->node;
         }
     };
@@ -131,13 +133,13 @@ public:
         root = NULL;
         size = 0;
     }
-    Iterator find(int value) {
-        Node* node = root;
-        while (node->value != value) {
-            if (value <= node->value && node->left!=NULL) {
+    Iterator find(TypeKey fkey) {
+        Node<TypeKey, TypeData>* node = root;
+        while (node->key != fkey) {
+            if (fkey <= node->key && node->left!=NULL) {
                 node = node->left;
             }
-            else if (value > node->value && node->right!=NULL) {
+            else if (fkey > node->key && node->right!=NULL) {
                 node = node->right;
             }
             else {
@@ -146,12 +148,27 @@ public:
         }
         return Iterator(node, root, size);
     }
-    void insert(int value) {
-        root = insertHelper(root, value);
+    Iterator begin() {
+        Node<TypeKey, TypeData>* node = root;
+        while (node->left != NULL) {
+            node = node->left;
+        }
+        return Iterator(node, root, size);
     }
 
-    void remove(int value) {
-        root = deleteHelper(root, value);
+    Iterator end() {
+        Node<TypeKey, TypeData>* node = root;
+        while (node->right != NULL) {
+            node = node->right;
+        }
+        return Iterator(node, root, size);
+    }
+    void insert(TypeKey key, TypeData value) {
+        root = insertHelper(root, key, value);
+    }
+
+    void remove(TypeKey key, TypeData value) {
+        root = deleteHelper(root,key, value);
     }
 
     void inorder() {
