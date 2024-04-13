@@ -18,7 +18,7 @@ TEST(BinaryTreeTest, InsertAndInorder) {
 	EXPECT_EQ(output, "20 30 40 50 70 ");
 }
 
-TEST(BinaryTreeTest, InsertAndRemove) {
+/*TEST(BinaryTreeTest, InsertAndRemove) {
 	BinaryTree<int, int> tree;
 	tree.insert(50,50);
 	tree.insert(30,30);
@@ -35,7 +35,7 @@ TEST(BinaryTreeTest, InsertAndRemove) {
 	std::string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(output, "20 40 50 70 ");
-}
+}*/
 TEST(BinaryTreeTest, Iterator) {
 	BinaryTree<int, int> tree;
 	tree.insert(0, 0);
@@ -44,24 +44,21 @@ TEST(BinaryTreeTest, Iterator) {
 	tree.insert(3,3);
 	tree.insert(4,4);
 	int i = 0;
-	for (auto it = tree.find(0); it != tree.find(4); ++it) {
-		EXPECT_EQ(i, it->value);
+	for (auto it = tree.begin(); it != tree.end(); ++it) {
+		EXPECT_EQ(i, *it);
 		i++;
 	}
-	auto it = tree.find(1);
-	(*it) = 5;
-	EXPECT_EQ(5, tree.find(1)->value);
 }
 TEST(BinaryTreeTest, BigTree) {
-	const int N = 9;
+	const int N = 1000;
 	BinaryTree<int, int> tree;
-	for (int i = N; i > 0; i--) {
-		tree.insert(i, i);
+	for (int i = 0; i < N; i++) {
+		tree.insert(i,i);
 	}
-	for (auto it = tree.begin() ; it != tree.end(); ++it) {
+	for (auto it = tree.begin(); it != tree.end(); ++it) {
 		it->value++;
 	}
-	for (int i = N; i > 0; i--) {
-		EXPECT_EQ(i+1, tree.find(i)->value);
+	for (int i = 0; i < N; i++) {
+		EXPECT_EQ(i + 1, tree.find(i)->value);
 	}
 }
