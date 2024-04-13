@@ -18,7 +18,7 @@ TEST(BinaryTreeTest, InsertAndInorder) {
 	EXPECT_EQ(output, "20 30 40 50 70 ");
 }
 
-/*TEST(BinaryTreeTest, InsertAndRemove) {
+TEST(BinaryTreeTest, InsertAndRemove) {
 	BinaryTree<int, int> tree;
 	tree.insert(50,50);
 	tree.insert(30,30);
@@ -35,7 +35,7 @@ TEST(BinaryTreeTest, InsertAndInorder) {
 	std::string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(output, "20 40 50 70 ");
-}*/
+}
 TEST(BinaryTreeTest, Iterator) {
 	BinaryTree<int, int> tree;
 	tree.insert(0, 0);
