@@ -27,7 +27,7 @@ private:
         if (node == NULL) {
             return new Node<TypeKey, TypeData>(key, value);
         }
-        if (value <= node->value) {
+        if (key <= node->key) {
             node->left = insertHelper(node->left, key, value);
             node->left->parent = node;
         }
@@ -46,15 +46,17 @@ private:
         return current;
     }
 
-    Node<TypeKey, TypeData>* deleteHelper(Node<TypeKey, TypeData>* node, TypeKey key, TypeData value) {
+    Node<TypeKey, TypeData>* deleteHelper(Node<TypeKey, TypeData>* node, TypeKey key) {
         if (node == NULL) {
             return node;
         }
-        if (value < node->value) {
-            node->left = deleteHelper(node->left, key, value);
+        if (key < node->key) {
+            node->left = deleteHelper(node->left, key);
+            node->left->parent = node;
         }
-        else if (value > node->value) {
-            node->right = deleteHelper(node->right, key, value);
+        else if (key > node->key) {
+            node->right = deleteHelper(node->right, key);
+            node->right->parent = node;
         }
         else {
             if (node->left == NULL) {
@@ -69,7 +71,7 @@ private:
             }
             Node<TypeKey, TypeData>* temp = minValueNode(node->right);
             node->value = temp->key;
-            node->right = deleteHelper(node->right, temp->key, temp->value);
+            node->right = deleteHelper(node->right, temp->key);
         }
         return node;
     }
@@ -161,8 +163,8 @@ public:
         size++;
     }
 
-    void remove(TypeKey key, TypeData value) {
-        root = deleteHelper(root,key, value);
+    void remove(TypeKey key) {
+        root = deleteHelper(root,key);
         size--;
     }
 

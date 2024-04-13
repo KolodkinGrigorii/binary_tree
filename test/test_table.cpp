@@ -26,7 +26,7 @@ TEST(BinaryTreeTest, InsertAndRemove) {
 	tree.insert(20,20);
 	tree.insert(40,40);
 
-	tree.remove(30,30);
+	tree.remove(30);
 
 	testing::internal::CaptureStdout();
 
