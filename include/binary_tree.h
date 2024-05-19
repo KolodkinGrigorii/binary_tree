@@ -8,6 +8,7 @@ struct Node {
     Node* left;
     Node* right;
     Node* parent;
+    int height;
 
     Node(TypeKey nkey, TypeData val) {
         key = nkey;
@@ -15,6 +16,8 @@ struct Node {
         left = NULL;
         right = NULL;
         parent = NULL;
+        height = 0;
+
     }
 };
 template<typename TypeKey, typename TypeData>
@@ -35,6 +38,7 @@ private:
             node->right = insertHelper(node->right, key, value);
             node->right->parent = node;
         }
+        updateHeight(node);
         return node;
     }
 
@@ -52,11 +56,15 @@ private:
         }
         if (key < node->key) {
             node->left = deleteHelper(node->left, key);
-            node->left->parent = node;
+            if (node->left != nullptr) {
+                node->left->parent = node;
+            }
         }
         else if (key > node->key) {
             node->right = deleteHelper(node->right, key);
-            node->right->parent = node;
+            if (node->right != nullptr) {
+                node->right->parent = node;
+            }
         }
         else {
             if (node->left == NULL) {
@@ -82,6 +90,12 @@ private:
             cout << node->value << " ";
             inorderHelper(node->right);
         }
+    }
+    int heightHelper(Node<TypeKey, TypeData>* node) const {
+        return node == nullptr ? 0 : node->height;
+    }
+    void updateHeight(Node<TypeKey, TypeData>* node) {
+        node->height = std::max(heightHelper(node->left), heightHelper(node->right)) + 1;
     }
 
 public:
@@ -147,6 +161,21 @@ public:
         }
         return Iterator(node);
     }
+    TypeData& operator[](TypeKey fkey) {
+        Node<TypeKey, TypeData>* node = root;
+        while (node->key != fkey) {
+            if (fkey <= node->key && node->left != NULL) {
+                node = node->left;
+            }
+            else if (fkey > node->key && node->right != NULL) {
+                node = node->right;
+            }
+            else {
+                throw "Invalid key";
+            }
+        }
+        return node->value;
+    }
     Iterator begin() {
         Node<TypeKey, TypeData>* node = root;
         while (node->left != NULL) {
@@ -170,5 +199,11 @@ public:
 
     void inorder() {
         inorderHelper(root);
+    }
+    int getsize() {
+        return size;
+    }
+    int getheight() {
+        return root->height;
     }
 };
